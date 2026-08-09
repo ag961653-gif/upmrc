@@ -1,15 +1,26 @@
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 
 import "swiper/css";
 
 import SectionHeader from "./SectionHeader";
-import { birthdays } from "./mockData";
+import { getTodaysBirthdays } from "../../services/employeeService";
 
 const BirthdayCarousel = () => {
+	const [birthdays, setBirthdays] = useState([]);
+
+	useEffect(() => {
+		getTodaysBirthdays()
+			.then(setBirthdays)
+			.catch(() => setBirthdays([]));
+	}, []);
+
+	if (birthdays.length === 0) return null;
+
 	return (
 		<div className="mt-3">
-			<SectionHeader title="Resources" />
+			<SectionHeader title="Today's Birthdays" />
 
 			<Swiper
 				modules={[Autoplay]}
@@ -21,7 +32,7 @@ const BirthdayCarousel = () => {
 				className="mt-3"
 			>
 				{birthdays.map((person) => (
-					<SwiperSlide key={person.id}>
+					<SwiperSlide key={person._id}>
 						<BirthdayCard person={person} />
 					</SwiperSlide>
 				))}
@@ -53,19 +64,19 @@ function BirthdayCard({ person }) {
 					Happy Birthday
 				</h2>
 
-				<img
-					src={person.image}
-					className="w-48 h-48 rounded-full border-[5px] border-cyan-700 object-cover mt-8  "
-					alt=""
-				/>
+				<div className="w-48 h-48 rounded-full border-[5px] border-cyan-700 bg-white/70 mt-8 flex items-center justify-center">
+					<span className="text-6xl font-bold text-cyan-800">{person.name?.[0]}</span>
+				</div>
 
 				<h3 className="mt-5 text-4xl text-gray-700" style={{ fontFamily: "Georgia" }}>
 					{person.name}
 				</h3>
 
-				<p className="text-2xl mt-2">{person.designation}</p>
+				<p className="text-2xl mt-2">{person.role}</p>
 
-				<p className="text-3xl mt-4">{person.date}</p>
+				<p className="text-3xl mt-4">
+					{new Date(person.dateOfBirth).toLocaleDateString("en-IN", { day: "numeric", month: "long" })}
+				</p>
 			</div>
 		</div>
 	);

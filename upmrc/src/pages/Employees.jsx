@@ -17,7 +17,8 @@ const Employees = () => {
     age: '',
     role: '',
     email: '',
-    phone: ''
+    phone: '',
+    dateOfBirth: ''
   });
 
   useEffect(() => {
@@ -44,11 +45,12 @@ const Employees = () => {
         age: employee.age,
         role: employee.role,
         email: employee.email,
-        phone: employee.phone
+        phone: employee.phone,
+        dateOfBirth: employee.dateOfBirth ? employee.dateOfBirth.slice(0, 10) : ''
       });
     } else {
       setEditingEmployee(null);
-      setFormData({ name: '', age: '', role: '', email: '', phone: '' });
+      setFormData({ name: '', age: '', role: '', email: '', phone: '', dateOfBirth: '' });
     }
     setIsModalOpen(true);
   };
@@ -291,7 +293,19 @@ const Employees = () => {
                   placeholder="+91 9876543210"
                 />
               </div>
-              
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Date of Birth</label>
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                />
+                <p className="text-xs text-slate-400 mt-1">Used to show today's birthdays on the homepage.</p>
+              </div>
+
               <div className="pt-4 flex gap-3">
                 <button
                   type="button"

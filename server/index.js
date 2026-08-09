@@ -4,6 +4,9 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
+const quickLinkRoutes = require('./routes/quickLinkRoutes');
+const holidayRoutes = require('./routes/holidayRoutes');
+const newsRoutes = require('./routes/newsRoutes');
 
 // Connect to database
 connectDB();
@@ -21,6 +24,9 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/employees', employeeRoutes);
+app.use('/api/quicklinks', quickLinkRoutes);
+app.use('/api/holidays', holidayRoutes);
+app.use('/api/news', newsRoutes);
 
 const PORT = process.env.PORT || 5000;
 

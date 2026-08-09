@@ -64,4 +64,28 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
-module.exports = { getEmployees, addEmployee, updateEmployee, deleteEmployee };
+const getTodaysBirthdays = async (req, res) => {
+  try {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    const employees = await Employee.aggregate([
+      { $match: { dateOfBirth: { $exists: true, $ne: null } } },
+      {
+        $addFields: {
+          bMonth: { $month: '$dateOfBirth' },
+          bDay: { $dayOfMonth: '$dateOfBirth' },
+        },
+      },
+      { $match: { bMonth: month, bDay: day } },
+      { $project: { bMonth: 0, bDay: 0 } },
+    ]);
+
+    res.json(employees);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getEmployees, addEmployee, updateEmployee, deleteEmployee, getTodaysBirthdays };

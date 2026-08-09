@@ -19,3 +19,8 @@ export const deleteEmployee = async (id) => {
   const { data } = await api.delete(`/employees/${id}`);
   return data;
 };
+
+export const getTodaysBirthdays = async () => {
+  const { data } = await api.get('/employees/birthdays/today');
+  return data;
+};
