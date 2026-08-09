@@ -8,16 +8,22 @@ import "swiper/css/pagination";
 
 import { getNewsClippings } from "../../services/newsService";
 
+// Shown until an admin adds clippings from /admin — never leaves the widget empty.
+const DEFAULT_NEWS = [
+	{ _id: "default-1", image: "/news1.jpeg" },
+	{ _id: "default-2", image: "/news2.jpeg" },
+	{ _id: "default-3", image: "/news3.jpeg" },
+	{ _id: "default-4", image: "/news4.jpeg" },
+];
+
 const NewsClipping = () => {
-	const [newsData, setNewsData] = useState([]);
+	const [newsData, setNewsData] = useState(DEFAULT_NEWS);
 
 	useEffect(() => {
 		getNewsClippings()
-			.then(setNewsData)
-			.catch(() => setNewsData([]));
+			.then((data) => setNewsData(data.length > 0 ? data : DEFAULT_NEWS))
+			.catch(() => setNewsData(DEFAULT_NEWS));
 	}, []);
-
-	if (newsData.length === 0) return null;
 
 	return (
 		<div className=" max-h-[285px] overflow-hidden rounded-xl bg-white shadow-md">
