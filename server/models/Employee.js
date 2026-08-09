@@ -21,6 +21,9 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  dateOfBirth: {
+    type: Date,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import { HiNewspaper } from "react-icons/hi2";
@@ -5,9 +6,19 @@ import { HiNewspaper } from "react-icons/hi2";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import { newsData } from "./newsData";
+import { getNewsClippings } from "../../services/newsService";
 
 const NewsClipping = () => {
+	const [newsData, setNewsData] = useState([]);
+
+	useEffect(() => {
+		getNewsClippings()
+			.then(setNewsData)
+			.catch(() => setNewsData([]));
+	}, []);
+
+	if (newsData.length === 0) return null;
+
 	return (
 		<div className=" max-h-[285px] overflow-hidden rounded-xl bg-white shadow-md">
 			{/* Header */}
@@ -31,11 +42,11 @@ const NewsClipping = () => {
 				}}
 			>
 				{newsData.map((item) => (
-					<SwiperSlide key={item.id}>
+					<SwiperSlide key={item._id}>
 						<div className="p-3">
 							<img
 								src={item.image}
-								alt="News Clipping"
+								alt={item.title || "News Clipping"}
 								className="w-full aspect-square object-contain rounded-lg bg-white"
 							/>
 						</div>

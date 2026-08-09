@@ -4,11 +4,19 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Employees from "./pages/Employees";
-import { isAuthenticated } from "./services/authService";
+import Admin from "./pages/Admin";
+import { isAuthenticated, getCurrentUser } from "./services/authService";
 
 // Protected Route wrapper - redirects to login if not authenticated
 function ProtectedRoute({ children }) {
 	return isAuthenticated() ? children : <Navigate to="/login" replace />;
+}
+
+// Admin Route wrapper - redirects non-admins away
+function AdminRoute({ children }) {
+	if (!isAuthenticated()) return <Navigate to="/login" replace />;
+	const user = getCurrentUser();
+	return user?.role === "admin" ? children : <Navigate to="/home" replace />;
 }
 
 function App() {
@@ -33,6 +41,14 @@ function App() {
 						<ProtectedRoute>
 							<Employees />
 						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/admin"
+					element={
+						<AdminRoute>
+							<Admin />
+						</AdminRoute>
 					}
 				/>
 				<Route path="*" element={<Navigate to="/login" replace />} />

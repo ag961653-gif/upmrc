@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { getEmployees, addEmployee, updateEmployee, deleteEmployee } = require('../controllers/employeeController');
+const { getEmployees, addEmployee, updateEmployee, deleteEmployee, getTodaysBirthdays } = require('../controllers/employeeController');
 const { protect } = require('../middleware/auth');
+
+router.get('/birthdays/today', protect, getTodaysBirthdays);
 
 router.route('/')
   .get(protect, getEmployees)

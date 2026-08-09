@@ -57,3 +57,18 @@
 	background: transparent;
 	border: 2px solid #2f855a;
 }
+
+.upmrc-holiday-tile {
+	background: #fdecea !important;
+	color: #b3261e !important;
+	font-weight: 600;
+}
+
+.upmrc-holiday-dot {
+	display: block;
+	width: 6px;
+	height: 6px;
+	margin: 2px auto 0;
+	border-radius: 50%;
+	background: #b3261e;
+}
