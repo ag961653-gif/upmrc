@@ -5,10 +5,6 @@ const employeeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  age: {
-    type: Number,
-    required: true,
-  },
   role: {
     type: String,
     required: true,
@@ -23,6 +19,7 @@ const employeeSchema = new mongoose.Schema({
   },
   dateOfBirth: {
     type: Date,
+    required: true,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +28,18 @@ const employeeSchema = new mongoose.Schema({
   },
 }, {
   timestamps: true,
+  toJSON: { virtuals: true },
+});
+
+employeeSchema.virtual('age').get(function () {
+  if (!this.dateOfBirth) return null;
+  const today = new Date();
+  let age = today.getFullYear() - this.dateOfBirth.getFullYear();
+  const hasHadBirthdayThisYear =
+    today.getMonth() > this.dateOfBirth.getMonth() ||
+    (today.getMonth() === this.dateOfBirth.getMonth() && today.getDate() >= this.dateOfBirth.getDate());
+  if (!hasHadBirthdayThisYear) age -= 1;
+  return age;
 });
 
 const Employee = mongoose.model('Employee', employeeSchema);

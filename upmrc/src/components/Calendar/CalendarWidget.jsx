@@ -9,37 +9,29 @@ function isSameDay(a, b) {
 	return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
 
-// Shown until an admin adds holidays from /admin — 2026 Indian gazetted holidays.
-const DEFAULT_HOLIDAYS = [
-	{ _id: "default-1", title: "Republic Day", date: "2026-01-26" },
-	{ _id: "default-2", title: "Holi", date: "2026-03-04" },
-	{ _id: "default-3", title: "Ram Navami", date: "2026-03-26" },
-	{ _id: "default-4", title: "Mahavir Jayanti", date: "2026-03-31" },
-	{ _id: "default-5", title: "Good Friday", date: "2026-04-03" },
-	{ _id: "default-6", title: "Buddha Purnima", date: "2026-05-01" },
-	{ _id: "default-7", title: "Independence Day", date: "2026-08-15" },
-	{ _id: "default-8", title: "Janmashtami", date: "2026-09-04" },
-	{ _id: "default-9", title: "Mahatma Gandhi Jayanti", date: "2026-10-02" },
-	{ _id: "default-10", title: "Dussehra", date: "2026-10-20" },
-	{ _id: "default-11", title: "Diwali", date: "2026-11-08" },
-	{ _id: "default-12", title: "Guru Nanak Jayanti", date: "2026-11-24" },
-	{ _id: "default-13", title: "Christmas Day", date: "2026-12-25" },
-];
-
 export default function CalendarWidget() {
 	const [date, setDate] = useState(new Date());
-	const [holidays, setHolidays] = useState(DEFAULT_HOLIDAYS);
+	const [holidays, setHolidays] = useState([]);
+	const [selectedHoliday, setSelectedHoliday] = useState(null);
+	const [selectedDate, setSelectedDate] = useState(null);
 
 	useEffect(() => {
 		getHolidays()
-			.then((data) => setHolidays(data.length > 0 ? data : DEFAULT_HOLIDAYS))
-			.catch(() => setHolidays(DEFAULT_HOLIDAYS));
+			.then(setHolidays)
+			.catch(() => setHolidays([]));
 	}, []);
 
 	const holidayOnDate = (tileDate) => holidays.find((h) => isSameDay(new Date(h.date), tileDate));
 
+	const handleDayClick = (clickedDate) => {
+		setDate(clickedDate);
+		setSelectedDate(clickedDate);
+		setSelectedHoliday(holidayOnDate(clickedDate) || null);
+	};
+
 	const upcoming = holidays
 		.filter((h) => new Date(h.date) >= new Date(new Date().toDateString()))
+		.sort((a, b) => new Date(a.date) - new Date(b.date))
 		.slice(0, 3);
 
 	return (
@@ -47,14 +39,28 @@ export default function CalendarWidget() {
 			<Calendar
 				value={date}
 				onChange={setDate}
+				onClickDay={handleDayClick}
 				prev2Label={null}
 				next2Label={null}
 				tileClassName={({ date: tileDate }) => (holidayOnDate(tileDate) ? "upmrc-holiday-tile" : null)}
-				tileContent={({ date: tileDate }) => {
-					const holiday = holidayOnDate(tileDate);
-					return holiday ? <span className="upmrc-holiday-dot" title={holiday.title} /> : null;
-				}}
 			/>
+
+			{selectedDate && (
+				<div className="px-2 py-2 mt-1 border-t border-gray-100 text-sm">
+					<span className="font-medium text-gray-700">
+						{selectedDate.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+					</span>
+					{selectedHoliday ? (
+						<p className="text-red-600 mt-0.5">
+							🎉 This is a holiday — <b>{selectedHoliday.title}</b>
+							{selectedHoliday.description ? `: ${selectedHoliday.description}` : ""}
+						</p>
+					) : (
+						<p className="text-gray-400 mt-0.5">Not a holiday.</p>
+					)}
+				</div>
+			)}
+
 			{upcoming.length > 0 && (
 				<div className="px-2 pb-2 pt-1 border-t border-gray-100 mt-1">
 					<p className="text-xs font-semibold text-gray-500 uppercase mb-1">Upcoming Holidays</p>

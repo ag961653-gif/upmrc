@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import * as employeeService from '../services/employeeService';
-import { useAuth } from '../context/AuthContext';
+import PortalLayout from '../components/Layout/PortalLayout';
+
+function calculateAge(dateOfBirth) {
+  if (!dateOfBirth) return null;
+  const dob = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const hasHadBirthdayThisYear =
+    today.getMonth() > dob.getMonth() ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate());
+  if (!hasHadBirthdayThisYear) age -= 1;
+  return age;
+}
 
 const Employees = () => {
   const [employees, setEmployees] = useState([]);
@@ -10,11 +22,9 @@ const Employees = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
-  const { logoutUser, user } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     name: '',
-    age: '',
     role: '',
     email: '',
     phone: '',
@@ -42,7 +52,6 @@ const Employees = () => {
       setEditingEmployee(employee);
       setFormData({
         name: employee.name,
-        age: employee.age,
         role: employee.role,
         email: employee.email,
         phone: employee.phone,
@@ -50,7 +59,7 @@ const Employees = () => {
       });
     } else {
       setEditingEmployee(null);
-      setFormData({ name: '', age: '', role: '', email: '', phone: '', dateOfBirth: '' });
+      setFormData({ name: '', role: '', email: '', phone: '', dateOfBirth: '' });
     }
     setIsModalOpen(true);
   };
@@ -99,32 +108,14 @@ const Employees = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white shadow-sm border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center shadow-md">
-            <span className="text-white font-bold text-xl">U</span>
-          </div>
-          <h1 className="text-xl font-bold text-slate-800">UPMRC Portal</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-slate-600 text-sm font-medium">Hello, {user?.name || 'User'}</span>
-          <button 
-            onClick={logoutUser}
-            className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
+    <PortalLayout>
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Employee Management</h2>
             <p className="text-slate-500 mt-1">Manage UPMRC staff directory and details.</p>
           </div>
-          <button 
+          <button
             onClick={() => handleOpenModal()}
             className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-md shadow-blue-500/20 transform hover:-translate-y-0.5 transition-all"
           >
@@ -153,6 +144,7 @@ const Employees = () => {
                     <th className="px-6 py-4 font-semibold">Name</th>
                     <th className="px-6 py-4 font-semibold">Role</th>
                     <th className="px-6 py-4 font-semibold">Contact</th>
+                    <th className="px-6 py-4 font-semibold">Date of Birth</th>
                     <th className="px-6 py-4 font-semibold">Age</th>
                     <th className="px-6 py-4 font-semibold text-right">Actions</th>
                   </tr>
@@ -172,17 +164,22 @@ const Employees = () => {
                         <div className="text-sm text-slate-600">{emp.email}</div>
                         <div className="text-xs text-slate-400 mt-0.5">{emp.phone}</div>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{emp.age}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {emp.dateOfBirth
+                          ? new Date(emp.dateOfBirth).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                          : '—'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{emp.age ?? calculateAge(emp.dateOfBirth) ?? '—'}</td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
+                          <button
                             onClick={() => handleOpenModal(emp)}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <FaEdit />
                           </button>
-                          <button 
+                          <button
                             onClick={() => confirmDelete(emp)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Delete"
@@ -217,14 +214,14 @@ const Employees = () => {
               <h3 className="text-lg font-bold text-slate-800">
                 {editingEmployee ? 'Edit Employee' : 'Add New Employee'}
               </h3>
-              <button 
+              <button
                 onClick={handleCloseModal}
                 className="text-slate-400 hover:text-slate-600 transition-colors"
               >
                 <FaTimes />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
@@ -238,20 +235,17 @@ const Employees = () => {
                   placeholder="John Doe"
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Age</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Date of Birth</label>
                   <input
-                    type="number"
-                    name="age"
-                    value={formData.age}
+                    type="date"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
                     onChange={handleInputChange}
                     required
-                    min="18"
-                    max="100"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                    placeholder="30"
                   />
                 </div>
                 <div>
@@ -267,7 +261,8 @@ const Employees = () => {
                   />
                 </div>
               </div>
-              
+              <p className="text-xs text-slate-400 -mt-2">Age is calculated automatically from date of birth. This date also drives the homepage birthday card.</p>
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
                 <input
@@ -280,7 +275,7 @@ const Employees = () => {
                   placeholder="john@upmrc.com"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Phone</label>
                 <input
@@ -292,18 +287,6 @@ const Employees = () => {
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                   placeholder="+91 9876543210"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Date of Birth</label>
-                <input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                />
-                <p className="text-xs text-slate-400 mt-1">Used to show today's birthdays on the homepage.</p>
               </div>
 
               <div className="pt-4 flex gap-3">
@@ -354,7 +337,7 @@ const Employees = () => {
           </div>
         </div>
       )}
-    </div>
+    </PortalLayout>
   );
 };
 

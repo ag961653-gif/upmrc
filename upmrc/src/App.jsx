@@ -5,6 +5,7 @@ import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Employees from "./pages/Employees";
 import Admin from "./pages/Admin";
+import Birthdays from "./pages/Birthdays";
 import { isAuthenticated, getCurrentUser } from "./services/authService";
 
 // Protected Route wrapper - redirects to login if not authenticated
@@ -40,6 +41,14 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<Employees />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/birthdays"
+					element={
+						<ProtectedRoute>
+							<Birthdays />
 						</ProtectedRoute>
 					}
 				/>

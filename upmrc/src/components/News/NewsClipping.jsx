@@ -8,21 +8,15 @@ import "swiper/css/pagination";
 
 import { getNewsClippings } from "../../services/newsService";
 
-// Shown until an admin adds clippings from /admin — never leaves the widget empty.
-const DEFAULT_NEWS = [
-	{ _id: "default-1", image: "/news1.jpeg" },
-	{ _id: "default-2", image: "/news2.jpeg" },
-	{ _id: "default-3", image: "/news3.jpeg" },
-	{ _id: "default-4", image: "/news4.jpeg" },
-];
-
 const NewsClipping = () => {
-	const [newsData, setNewsData] = useState(DEFAULT_NEWS);
+	const [newsData, setNewsData] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		getNewsClippings()
-			.then((data) => setNewsData(data.length > 0 ? data : DEFAULT_NEWS))
-			.catch(() => setNewsData(DEFAULT_NEWS));
+			.then(setNewsData)
+			.catch(() => setNewsData([]))
+			.finally(() => setLoading(false));
 	}, []);
 
 	return (
@@ -33,32 +27,35 @@ const NewsClipping = () => {
 				<h2 className="text-xl font-semibold">News Clipping</h2>
 			</div>
 
-			{/* Slider */}
-			<Swiper
-				modules={[Autoplay, Pagination]}
-				slidesPerView={1}
-				loop={true}
-				speed={800}
-				autoplay={{
-					delay: 3500,
-					disableOnInteraction: false,
-				}}
-				pagination={{
-					clickable: true,
-				}}
-			>
-				{newsData.map((item) => (
-					<SwiperSlide key={item._id}>
-						<div className="p-3">
-							<img
-								src={item.image}
-								alt={item.title || "News Clipping"}
-								className="w-full aspect-square object-contain rounded-lg bg-white"
-							/>
-						</div>
-					</SwiperSlide>
-				))}
-			</Swiper>
+			{!loading && newsData.length === 0 ? (
+				<p className="p-4 text-sm text-gray-400">No clippings added yet.</p>
+			) : (
+				<Swiper
+					modules={[Autoplay, Pagination]}
+					slidesPerView={1}
+					loop={true}
+					speed={800}
+					autoplay={{
+						delay: 3500,
+						disableOnInteraction: false,
+					}}
+					pagination={{
+						clickable: true,
+					}}
+				>
+					{newsData.map((item) => (
+						<SwiperSlide key={item._id}>
+							<div className="p-3">
+								<img
+									src={item.image}
+									alt={item.title || "News Clipping"}
+									className="w-full aspect-square object-contain rounded-lg bg-white"
+								/>
+							</div>
+						</SwiperSlide>
+					))}
+				</Swiper>
+			)}
 		</div>
 	);
 };

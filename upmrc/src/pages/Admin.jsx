@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
 import * as quickLinkService from '../services/quickLinkService';
 import * as holidayService from '../services/holidayService';
 import * as newsService from '../services/newsService';
+import PortalLayout from '../components/Layout/PortalLayout';
 
 const TABS = [
   { key: 'quicklinks', label: 'Quick Links' },
@@ -13,27 +13,15 @@ const TABS = [
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('quicklinks');
-  const { logoutUser, user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white shadow-sm border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center shadow-md">
-            <span className="text-white font-bold text-xl">U</span>
-          </div>
-          <h1 className="text-xl font-bold text-slate-800">Admin Panel</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <a href="/home" className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors">Back to site</a>
-          <span className="text-slate-600 text-sm font-medium">Hello, {user?.name || 'Admin'}</span>
-          <button onClick={logoutUser} className="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors">
-            Logout
-          </button>
-        </div>
-      </nav>
-
+    <PortalLayout>
       <main className="max-w-5xl mx-auto px-6 py-8">
+        <div className="mb-6">
+          <h2 className="text-3xl font-bold text-slate-800 tracking-tight">Admin Panel</h2>
+          <p className="text-slate-500 mt-1">Manage the content shown across the portal's homepage.</p>
+        </div>
+
         <div className="flex gap-2 mb-8 border-b border-slate-200">
           {TABS.map((tab) => (
             <button
@@ -54,7 +42,7 @@ export default function Admin() {
         {activeTab === 'holidays' && <HolidaysPanel />}
         {activeTab === 'news' && <NewsPanel />}
       </main>
-    </div>
+    </PortalLayout>
   );
 }
 

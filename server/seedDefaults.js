@@ -1,16 +1,25 @@
-// One-off script to seed real default Quick Links + 2026 Indian gazetted holidays.
+// One-off script to seed real default Quick Links, the 2026 Indian gazetted
+// holiday calendar, and placeholder news clippings.
 // Safe to re-run: skips anything that already exists (matched by title).
 // Usage: node seedDefaults.js
 require('dotenv').config();
 const mongoose = require('mongoose');
 const QuickLink = require('./models/QuickLink');
 const Holiday = require('./models/Holiday');
+const NewsClipping = require('./models/NewsClipping');
 
+// All verified via web search against upmetrorail.com and its subdomains.
 const QUICK_LINKS = [
   { title: 'Official Website', url: 'https://upmetrorail.com', order: 1 },
   { title: 'Employee HRMS Portal', url: 'https://unif.upmrc-hrms.com/', order: 2 },
   { title: 'Careers / Recruitment', url: 'https://upmetrorail.com/careers/new-recruitments', order: 3 },
-  { title: 'Lucknow Metro Info', url: 'https://lucknow.upmetrorail.com', order: 4 },
+  { title: 'Tenders', url: 'https://upmetrorail.com/tenders', order: 4 },
+  { title: 'Lucknow Metro', url: 'https://lucknow.upmetrorail.com', order: 5 },
+  { title: 'Kanpur Metro', url: 'https://kanpur.upmetrorail.com/pages/project-overview', order: 6 },
+  { title: 'Agra Metro', url: 'https://agra.upmetrorail.com', order: 7 },
+  { title: 'Meerut Metro', url: 'https://meerutmetro.in', order: 8 },
+  { title: 'Facebook', url: 'https://www.facebook.com/OfficialUPMetro/', order: 9 },
+  { title: 'X (Twitter)', url: 'https://x.com/officialupmetro', order: 10 },
 ];
 
 const HOLIDAYS_2026 = [
@@ -29,6 +38,13 @@ const HOLIDAYS_2026 = [
   { title: 'Christmas Day', date: '2026-12-25' },
 ];
 
+// Real, working placeholder images (picsum.photos) — swap for real clippings via /admin whenever ready.
+const DUMMY_NEWS = Array.from({ length: 10 }, (_, i) => ({
+  title: `Sample Clipping ${i + 1}`,
+  image: `https://picsum.photos/seed/upmrc-news-${i + 1}/600/600`,
+  order: i + 1,
+}));
+
 (async () => {
   await mongoose.connect(process.env.MONGO_URI);
 
@@ -41,6 +57,11 @@ const HOLIDAYS_2026 = [
     await Holiday.updateOne({ title: holiday.title }, { $setOnInsert: holiday }, { upsert: true });
   }
   console.log(`Seeded ${HOLIDAYS_2026.length} holidays (existing ones left untouched).`);
+
+  for (const clipping of DUMMY_NEWS) {
+    await NewsClipping.updateOne({ title: clipping.title }, { $setOnInsert: clipping }, { upsert: true });
+  }
+  console.log(`Seeded ${DUMMY_NEWS.length} placeholder news clippings (existing ones left untouched).`);
 
   await mongoose.disconnect();
 })();
