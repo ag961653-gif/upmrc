@@ -2,14 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const runBootstrap = require('./bootstrap');
 const authRoutes = require('./routes/authRoutes');
 const employeeRoutes = require('./routes/employeeRoutes');
 const quickLinkRoutes = require('./routes/quickLinkRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 
-// Connect to database
-connectDB();
+// Connect to database, then ensure starter content/admin exist
+connectDB().then(runBootstrap);
 
 const app = express();
 

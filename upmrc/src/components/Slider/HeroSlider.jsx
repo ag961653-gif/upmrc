@@ -3,6 +3,7 @@ import { Navigation, Autoplay } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
+import "./HeroSlider.css";
 
 import { sliderData } from "./sliderData";
 
@@ -17,14 +18,14 @@ const HeroSlider = () => {
         autoplay={{
           delay: 4000,
         }}
-        className="rounded-lg overflow-hidden"
+        className="hero-swiper rounded-lg"
       >
         {sliderData.map((item) => (
           <SwiperSlide key={item.id}>
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-[285px] object-cover"
+              className="w-full h-[285px] object-cover rounded-lg"
             />
           </SwiperSlide>
         ))}
