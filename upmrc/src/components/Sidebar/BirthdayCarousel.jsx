@@ -43,41 +43,26 @@ const BirthdayCarousel = () => {
 
 function BirthdayCard({ person }) {
 	return (
-		<div
-			className="relative h-96 w-10/12 overflow-hidden"
-			style={{
-				backgroundImage:
-					"url('https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800')",
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-			}}
-		>
-			<div className="absolute inset-0 bg-white/30"></div>
+		<div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-cyan-600 to-teal-700 px-4 py-5 text-center text-white shadow-md">
+			<div className="text-3xl">🎂</div>
 
-			<div className="relative flex flex-col items-center pt-8">
-				<div className="text-5xl">🎂</div>
+			<h2 className="mt-1 text-lg font-bold tracking-wide" style={{ fontFamily: "Georgia" }}>
+				Happy Birthday
+			</h2>
 
-				<h2
-					className="text-[#7E170D] text-5xl mt-3 font-bold"
-					style={{ fontFamily: "Georgia" }}
-				>
-					Happy Birthday
-				</h2>
-
-				<div className="w-48 h-48 rounded-full border-[5px] border-cyan-700 bg-white/70 mt-8 flex items-center justify-center">
-					<span className="text-6xl font-bold text-cyan-800">{person.name?.[0]}</span>
-				</div>
-
-				<h3 className="mt-5 text-4xl text-gray-700" style={{ fontFamily: "Georgia" }}>
-					{person.name}
-				</h3>
-
-				<p className="text-2xl mt-2">{person.role}</p>
-
-				<p className="text-3xl mt-4">
-					{new Date(person.dateOfBirth).toLocaleDateString("en-IN", { day: "numeric", month: "long" })}
-				</p>
+			<div className="mx-auto mt-3 flex h-16 w-16 items-center justify-center rounded-full border-2 border-white/70 bg-white/15">
+				<span className="text-2xl font-bold">{person.name?.[0]}</span>
 			</div>
+
+			<h3 className="mt-3 truncate text-base font-semibold" title={person.name}>
+				{person.name}
+			</h3>
+
+			<p className="text-sm text-white/80">{person.role}</p>
+
+			<p className="mt-1 text-xs text-white/70">
+				{new Date(person.dateOfBirth).toLocaleDateString("en-IN", { day: "numeric", month: "long" })}
+			</p>
 		</div>
 	);
 }
