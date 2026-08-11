@@ -3,12 +3,16 @@ import { FaPlus, FaEdit, FaTrash, FaTimes } from 'react-icons/fa';
 import * as quickLinkService from '../services/quickLinkService';
 import * as holidayService from '../services/holidayService';
 import * as newsService from '../services/newsService';
+import * as circularService from '../services/circularService';
+import * as highlightService from '../services/highlightService';
 import PortalLayout from '../components/Layout/PortalLayout';
 
 const TABS = [
   { key: 'quicklinks', label: 'Quick Links' },
   { key: 'holidays', label: 'Holidays' },
   { key: 'news', label: 'News Clippings' },
+  { key: 'circulars', label: 'Circulars' },
+  { key: 'highlights', label: 'Highlights' },
 ];
 
 export default function Admin() {
@@ -41,6 +45,8 @@ export default function Admin() {
         {activeTab === 'quicklinks' && <QuickLinksPanel />}
         {activeTab === 'holidays' && <HolidaysPanel />}
         {activeTab === 'news' && <NewsPanel />}
+        {activeTab === 'circulars' && <CircularsPanel />}
+        {activeTab === 'highlights' && <HighlightsPanel />}
       </main>
     </PortalLayout>
   );
@@ -376,6 +382,186 @@ function NewsPanel() {
       )}
 
       {deleteItem && <DeleteModal label={deleteItem.title || 'This clipping'} onCancel={() => setDeleteItem(null)} onConfirm={handleDelete} />}
+    </PanelShell>
+  );
+}
+
+function CircularsPanel() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalItem, setModalItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [form, setForm] = useState({ number: '', title: '', publishedDate: '', pdf: '', order: 0 });
+
+  const fetchItems = async () => {
+    setLoading(true);
+    try {
+      setItems(await circularService.getCirculars());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchItems(); }, []);
+
+  const emptyForm = { number: '', title: '', publishedDate: '', pdf: '', order: 0 };
+  const openAdd = () => { setModalItem({}); setForm(emptyForm); };
+  const openEdit = (item) => {
+    setModalItem(item);
+    setForm({ number: item.number, title: item.title, publishedDate: item.publishedDate, pdf: item.pdf || '', order: item.order || 0 });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (modalItem._id) {
+      await circularService.updateCircular(modalItem._id, form);
+    } else {
+      await circularService.addCircular(form);
+    }
+    setModalItem(null);
+    fetchItems();
+  };
+
+  const handleDelete = async () => {
+    await circularService.deleteCircular(deleteItem._id);
+    setDeleteItem(null);
+    fetchItems();
+  };
+
+  return (
+    <PanelShell title="Circulars" description="Office circulars listed on the homepage." onAdd={openAdd} addLabel="Add Circular">
+      {loading ? <Loading /> : items.length === 0 ? <EmptyState label="Add a circular to get started." /> : (
+        <div className="divide-y divide-slate-100">
+          {items.map((item) => (
+            <div key={item._id} className="flex items-center justify-between px-6 py-4 hover:bg-slate-50 group">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full text-xs font-semibold">{item.number}</span>
+                  <span className="text-xs text-slate-400">{item.publishedDate}</span>
+                </div>
+                <div className="font-medium text-slate-900 mt-1">{item.title}</div>
+              </div>
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={() => openEdit(item)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><FaEdit /></button>
+                <button onClick={() => setDeleteItem(item)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><FaTrash /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {modalItem && (
+        <Modal title={modalItem._id ? 'Edit Circular' : 'Add Circular'} onClose={() => setModalItem(null)} onSubmit={handleSubmit}>
+          <div>
+            <label className={labelClass}>Circular Number</label>
+            <input className={inputClass} required value={form.number} onChange={(e) => setForm({ ...form, number: e.target.value })} placeholder="144-2023" />
+          </div>
+          <div>
+            <label className={labelClass}>Title</label>
+            <input className={inputClass} required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Fare Chart of Aqua Line Lucknow Metro" />
+          </div>
+          <div>
+            <label className={labelClass}>Published Date</label>
+            <input className={inputClass} required value={form.publishedDate} onChange={(e) => setForm({ ...form, publishedDate: e.target.value })} placeholder="11-Sep-2023" />
+          </div>
+          <div>
+            <label className={labelClass}>PDF Link (optional)</label>
+            <input className={inputClass} value={form.pdf} onChange={(e) => setForm({ ...form, pdf: e.target.value })} placeholder="https://.../circular.pdf" />
+            <p className="text-xs text-slate-400 mt-1">Paste a hosted document link. Leave blank if none.</p>
+          </div>
+          <div>
+            <label className={labelClass}>Order (lower shows first)</label>
+            <input type="number" className={inputClass} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
+          </div>
+          <div className="pt-2 flex gap-3">
+            <button type="button" onClick={() => setModalItem(null)} className="flex-1 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50">Cancel</button>
+            <button type="submit" className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl">Save</button>
+          </div>
+        </Modal>
+      )}
+
+      {deleteItem && <DeleteModal label={deleteItem.title || 'This circular'} onCancel={() => setDeleteItem(null)} onConfirm={handleDelete} />}
+    </PanelShell>
+  );
+}
+
+function HighlightsPanel() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modalItem, setModalItem] = useState(null);
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [form, setForm] = useState({ title: '', image: '', order: 0 });
+
+  const fetchItems = async () => {
+    setLoading(true);
+    try {
+      setItems(await highlightService.getHighlights());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchItems(); }, []);
+
+  const openAdd = () => { setModalItem({}); setForm({ title: '', image: '', order: 0 }); };
+  const openEdit = (item) => { setModalItem(item); setForm({ title: item.title || '', image: item.image, order: item.order || 0 }); };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (modalItem._id) {
+      await highlightService.updateHighlight(modalItem._id, form);
+    } else {
+      await highlightService.addHighlight(form);
+    }
+    setModalItem(null);
+    fetchItems();
+  };
+
+  const handleDelete = async () => {
+    await highlightService.deleteHighlight(deleteItem._id);
+    setDeleteItem(null);
+    fetchItems();
+  };
+
+  return (
+    <PanelShell title="Highlights" description="Images shown in the homepage top banner slider." onAdd={openAdd} addLabel="Add Highlight">
+      {loading ? <Loading /> : items.length === 0 ? <EmptyState label="Add a highlight image to get started." /> : (
+        <div className="grid grid-cols-3 gap-4 p-6">
+          {items.map((item) => (
+            <div key={item._id} className="relative group border border-slate-200 rounded-xl overflow-hidden">
+              <img src={item.image} alt={item.title || 'Highlight'} className="w-full h-32 object-cover" />
+              <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                <button onClick={() => openEdit(item)} className="p-2 bg-white text-blue-600 rounded-lg"><FaEdit /></button>
+                <button onClick={() => setDeleteItem(item)} className="p-2 bg-white text-red-600 rounded-lg"><FaTrash /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {modalItem && (
+        <Modal title={modalItem._id ? 'Edit Highlight' : 'Add Highlight'} onClose={() => setModalItem(null)} onSubmit={handleSubmit}>
+          <div>
+            <label className={labelClass}>Title (optional)</label>
+            <input className={inputClass} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Metro launch event" />
+          </div>
+          <div>
+            <label className={labelClass}>Image URL</label>
+            <input className={inputClass} required value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://.../banner.jpg" />
+            <p className="text-xs text-slate-400 mt-1">Paste a hosted image link (e.g. uploaded to any image host).</p>
+          </div>
+          <div>
+            <label className={labelClass}>Order (lower shows first)</label>
+            <input type="number" className={inputClass} value={form.order} onChange={(e) => setForm({ ...form, order: Number(e.target.value) })} />
+          </div>
+          <div className="pt-2 flex gap-3">
+            <button type="button" onClick={() => setModalItem(null)} className="flex-1 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50">Cancel</button>
+            <button type="submit" className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl">Save</button>
+          </div>
+        </Modal>
+      )}
+
+      {deleteItem && <DeleteModal label={deleteItem.title || 'This highlight'} onCancel={() => setDeleteItem(null)} onConfirm={handleDelete} />}
     </PanelShell>
   );
 }

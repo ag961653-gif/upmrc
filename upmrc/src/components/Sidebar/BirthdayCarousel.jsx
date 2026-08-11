@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
+import { FaBirthdayCake } from "react-icons/fa";
 
 import "swiper/css";
 
@@ -44,7 +45,7 @@ const BirthdayCarousel = () => {
 function BirthdayCard({ person }) {
 	return (
 		<div className="relative w-full overflow-hidden rounded-xl bg-gradient-to-br from-cyan-600 to-teal-700 px-4 py-5 text-center text-white shadow-md">
-			<div className="text-3xl">🎂</div>
+			<div className="text-3xl flex justify-center"><FaBirthdayCake /></div>
 
 			<h2 className="mt-1 text-lg font-bold tracking-wide" style={{ fontFamily: "Georgia" }}>
 				Happy Birthday

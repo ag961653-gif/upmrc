@@ -70,7 +70,9 @@ export default function Birthdays() {
                       </div>
                       <div className="font-semibold text-slate-900">{person.name}</div>
                       <div className="text-sm text-slate-500">{person.role}</div>
-                      <div className="text-xs text-pink-600 font-medium mt-2">🎉 Happy Birthday!</div>
+                      <div className="text-xs text-pink-600 font-medium mt-2 flex items-center gap-1">
+                        <FaBirthdayCake /> Happy Birthday!
+                      </div>
                     </div>
                   ))}
                 </div>

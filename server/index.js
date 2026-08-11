@@ -8,6 +8,8 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const quickLinkRoutes = require('./routes/quickLinkRoutes');
 const holidayRoutes = require('./routes/holidayRoutes');
 const newsRoutes = require('./routes/newsRoutes');
+const circularRoutes = require('./routes/circularRoutes');
+const highlightRoutes = require('./routes/highlightRoutes');
 
 // Connect to database, then ensure starter content/admin exist
 connectDB().then(runBootstrap);
@@ -28,6 +30,8 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/quicklinks', quickLinkRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/circulars', circularRoutes);
+app.use('/api/highlights', highlightRoutes);
 
 const PORT = process.env.PORT || 5000;
 

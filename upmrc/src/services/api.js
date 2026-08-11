@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // ============================================
-// 🔴 REPLACE THIS URL WITH YOUR DEPLOYED BACKEND URL
+// REPLACE THIS URL WITH YOUR DEPLOYED BACKEND URL
 // ============================================
 const API_BASE_URL = 'https://upmrc-2.onrender.com/api';
 

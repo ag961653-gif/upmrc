@@ -6,6 +6,8 @@ const Employee = require('./models/Employee');
 const QuickLink = require('./models/QuickLink');
 const Holiday = require('./models/Holiday');
 const NewsClipping = require('./models/NewsClipping');
+const Circular = require('./models/Circular');
+const Highlight = require('./models/Highlight');
 
 const QUICK_LINKS = [
   { title: 'Official Website', url: 'https://upmetrorail.com', order: 1 },
@@ -41,6 +43,19 @@ const DUMMY_NEWS = Array.from({ length: 10 }, (_, i) => ({
   image: `https://picsum.photos/seed/upmrc-news-${i + 1}/600/600`,
   order: i + 1,
 }));
+
+const CIRCULARS_DEFAULT = [
+  { number: '144-2023', title: 'Fare Chart of Aqua Line Lucknow Metro (w.e.f. 11.09.2023)', publishedDate: '11-Sep-2023', pdf: '#', order: 1 },
+  { number: '76-2022', title: 'Holiday List for Employees - Calendar Year 2024', publishedDate: '25-Dec-2023', pdf: '#', order: 2 },
+  { number: '65-2022', title: 'Guidelines regarding Employee Leave Management', publishedDate: '02-Aug-2023', pdf: '#', order: 3 },
+  { number: '41-2022', title: 'Updated Medical Reimbursement Policy', publishedDate: '15-Jul-2023', pdf: '#', order: 4 },
+];
+
+const HIGHLIGHTS_DEFAULT = [
+  { title: 'Metro 1', image: 'https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=1600', order: 1 },
+  { title: 'Metro 2', image: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1600', order: 2 },
+  { title: 'Metro 3', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600', order: 3 },
+];
 
 const DUMMY_EMPLOYEES = [
   { name: 'Pawan Chahar', role: 'Sr Maintainer', email: 'pawan.chahar@upmrc.com', phone: '+91 9800000001', dateOfBirth: '1996-08-10' },
@@ -80,6 +95,12 @@ async function runBootstrap() {
     }
     for (const clipping of DUMMY_NEWS) {
       await NewsClipping.updateOne({ title: clipping.title }, { $setOnInsert: clipping }, { upsert: true });
+    }
+    for (const circular of CIRCULARS_DEFAULT) {
+      await Circular.updateOne({ number: circular.number }, { $setOnInsert: circular }, { upsert: true });
+    }
+    for (const highlight of HIGHLIGHTS_DEFAULT) {
+      await Highlight.updateOne({ title: highlight.title }, { $setOnInsert: highlight }, { upsert: true });
     }
 
     if (admin) {
