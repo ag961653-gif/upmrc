@@ -39,9 +39,9 @@ function App() {
 				<Route
 					path="/employees"
 					element={
-						<ProtectedRoute>
+						<AdminRoute>
 							<Employees />
-						</ProtectedRoute>
+						</AdminRoute>
 					}
 				/>
 				<Route

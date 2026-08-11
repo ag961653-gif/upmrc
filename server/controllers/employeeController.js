@@ -2,7 +2,7 @@ const Employee = require('../models/Employee');
 
 const getEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find({ createdBy: req.user._id }).sort('-createdAt');
+    const employees = await Employee.find().sort('-createdAt');
     res.json(employees);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -29,10 +29,6 @@ const updateEmployee = async (req, res) => {
       return res.status(404).json({ message: 'Employee not found' });
     }
 
-    if (employee.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: 'User not authorized' });
-    }
-
     const updatedEmployee = await Employee.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -51,10 +47,6 @@ const deleteEmployee = async (req, res) => {
 
     if (!employee) {
       return res.status(404).json({ message: 'Employee not found' });
-    }
-
-    if (employee.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: 'User not authorized' });
     }
 
     await employee.deleteOne();

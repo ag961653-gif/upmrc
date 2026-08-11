@@ -38,13 +38,15 @@ const Navbar = () => {
 								<FaUserCircle className="text-gray-600 text-xl" />
 								<span className="font-medium text-gray-800">{user.name || 'User'}</span>
 							</div>
-							<Link
-								to="/employees"
-								className="flex items-center gap-2 rounded bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100"
-							>
-								<FaClipboardList className="text-sm" />
-								<span className="font-medium">Employees</span>
-							</Link>
+							{isAdmin && (
+								<Link
+									to="/employees"
+									className="flex items-center gap-2 rounded bg-blue-50 px-3 py-2 text-blue-700 transition hover:bg-blue-100"
+								>
+									<FaClipboardList className="text-sm" />
+									<span className="font-medium">Employees</span>
+								</Link>
+							)}
 							<Link
 								to="/birthdays"
 								className="flex items-center gap-2 rounded bg-pink-50 px-3 py-2 text-pink-700 transition hover:bg-pink-100"
